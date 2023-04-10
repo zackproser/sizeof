@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"os"
+	"sort"
 	"strings"
 	"sync"
 
@@ -111,6 +111,11 @@ func (m *model) fetchSizes() tea.Cmd {
 			m.results = append(m.results, sizeResult{Input: input, Size: size})
 			m.mu.Unlock()
 		}
+		// Sort the results initially
+		sort.Slice(m.results, func(i, j int) bool {
+			return m.results[i].Size < m.results[j].Size
+		})
+
 		return nil
 	}
 }
@@ -132,10 +137,6 @@ func parseFlags() []string {
 func isURL(input string) bool {
 	if strings.HasPrefix(input, "http://") || strings.HasPrefix(input, "https://") {
 		return true
-	}
-	_, err := url.Parse(input)
-	if err != nil {
-		return false
 	}
 	return false
 }
