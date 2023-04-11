@@ -4,8 +4,6 @@ A command line tool that tells you the size of anything you pass to it in bytes 
 
 sizeof is a command-line tool that helps you understand the size of various things such as arbitrary strings, URLs, and even the websites or HTML pages that may reside at those URLs. This project was born out of a personal itch to quickly gauge the size of different inputs and as an experiment to heavily leverage LLM technologies like ChatGPT-4 and GitHub's Copilot.
 
-Simply put, you give `sizeof` strings, URLs, and (eventually) filenames and you get back an easy-to-grok breakdown of the exact sizes of those things in bytes.
- 
 ```mermaid
 graph LR;
 A[User] --> B[CLI];
@@ -17,7 +15,11 @@ D --> G[Size in Bytes];
 E --> G;
 F --> G;
 ```
+## Demo
+![demo gif of sizeof usage](./sizeof-demo.gif)
 
+Simply put, you give `sizeof` strings, URLs, and (eventually) filenames and you get back an easy-to-grok breakdown of the exact sizes of those things in bytes.
+ 
 ## Motivation
 
 I like that old blog post about the relative speed and size of things (there's a bunch of them). This CLI is a step in that direction. By making it extremely cheap and fast to answer the question: "How big is that thing?", I hope to create my own habit of constantly checking and benchmarking the sizes and speeds of things when developing software.
@@ -30,7 +32,6 @@ I like that old blog post about the relative speed and size of things (there's a
 - [Installation](#installation)
 - [Usage](#usage)
 - [License](#license)
-- [Contributing](#contributing)
 - [Credits](#credits)
 
 ## Installation
