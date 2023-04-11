@@ -8,17 +8,17 @@ CI
 Go Report Card
 License: MIT
 
-mermaid
-
-graph LR
-A[User] --> B[CLI]
-B --> C{sizeof}
-C --> D[Arbitrary String]
-C --> E[URL]
-C --> F[File]
-D --> G[Size in Bytes]
-E --> G
-F --> G
+```mermaid
+graph LR;
+A[User] --> B[CLI];
+B --> C{sizeof};
+C --> D[Arbitrary String];
+C --> E[URL];
+C --> F[File];
+D --> G[Size in Bytes];
+E --> G;
+F --> G;
+```
 
 sizeof is an open source command line tool written in Golang that helps users understand the size of various things, such as arbitrary strings, URLs, and even the websites or HTML pages that may reside at those URLs. This project is an experiment to scratch a small technical itch and to explore the capabilities of LLM technologies like ChatGPT 4 and GitHub's Copilot in the development workflow.
 Table of Contents

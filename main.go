@@ -124,8 +124,6 @@ func parseFlags() []string {
 	flag.Parse()
 	args := flag.Args()
 
-	fmt.Printf("args: %v\n\n", args)
-
 	if len(args) == 0 {
 		fmt.Println("Please provide at least one string or URL.")
 		os.Exit(1)
