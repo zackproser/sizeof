@@ -16,8 +16,9 @@ import (
 )
 
 type sizeResult struct {
-	Input string
-	Size  int
+	Input       string
+	Size        int
+	Explanation string
 }
 
 type model struct {
@@ -25,6 +26,12 @@ type model struct {
 	results   []sizeResult
 	renderErr error
 	mu        sync.Mutex
+}
+
+func convertSizeToPercentageOfStrawmanString(size int) int {
+	// Render the rounded, human-legible version of the size, in comparison to the string:
+	// "Mary had a little lamb" - which is 22 bytes long
+	return int((float64(size) / float64(22)) * 100)
 }
 
 func main() {
@@ -63,15 +70,18 @@ func (m *model) View() string {
 	rowStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#DDD"))
 
 	header := lipgloss.JoinHorizontal(lipgloss.Top,
-		headerStyle.Width(40).Render("Input"),
-		headerStyle.Width(15).Render("Size (bytes)"),
+		headerStyle.Width(30).Render("Input"),
+		headerStyle.Width(30).Render("Bytes"),
+		headerStyle.Width(30).Render("Equivalent to.."),
 	)
 
 	var rows []string
 	for _, r := range m.results {
+		sizeRendered := fmt.Sprintf("%d%% of the sentence, Mary had a little lamb", convertSizeToPercentageOfStrawmanString(r.Size))
 		rows = append(rows, lipgloss.JoinHorizontal(lipgloss.Top,
-			rowStyle.Width(40).Render(r.Input),
-			rowStyle.Width(15).Render(fmt.Sprint(r.Size)),
+			rowStyle.Width(30).Render(r.Input),
+			rowStyle.Width(30).Render(fmt.Sprint(r.Size)),
+			rowStyle.Width(30).Render(fmt.Sprint(sizeRendered)),
 		))
 	}
 
@@ -80,7 +90,7 @@ func (m *model) View() string {
 	tableString := lipgloss.JoinVertical(lipgloss.Top, header, rowString)
 
 	table := lipgloss.NewStyle().
-		Width(60).
+		Width(140).
 		Padding(3).
 		Border(lipgloss.RoundedBorder()).
 		Render(tableString)
@@ -94,10 +104,13 @@ func (m *model) fetchSizes() tea.Cmd {
 			var size int
 			var err error
 
+			explanation := ""
 			if isURL(input) {
 				size, err = getSizeFromURL(input)
+				explanation = "The HTML content at this URL"
 			} else {
 				size = len(input)
+				explanation = "this string"
 			}
 
 			if err != nil {
@@ -107,8 +120,32 @@ func (m *model) fetchSizes() tea.Cmd {
 				return nil
 			}
 
+			// Determine some "human-friendly" sizes for comparison
+			var kb, mb, gb float64
+			kb = float64(size) / 1024
+			mb = kb / 1024
+			gb = mb / 1024
+
+			explanation += " is "
+
+			switch {
+			case gb >= 1:
+				explanation += fmt.Sprintf("%.2f GB", gb)
+			case mb >= 1:
+				explanation += fmt.Sprintf("%.2f MB", mb)
+			case kb >= 1:
+				explanation += fmt.Sprintf("%.2f KB", kb)
+			default:
+				explanation += fmt.Sprintf("%.2f bytes", size)
+			}
+
+			// Add explanation to results
 			m.mu.Lock()
-			m.results = append(m.results, sizeResult{Input: input, Size: size})
+			m.results = append(m.results, sizeResult{
+				Input:       input,
+				Size:        size,
+				Explanation: explanation,
+			})
 			m.mu.Unlock()
 		}
 		// Sort the results initially
